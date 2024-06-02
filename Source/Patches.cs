@@ -65,8 +65,8 @@ namespace PackagedBleachStone
                     && codes[ i + 4 ].IsStloc())
                 {
                     // The return value from the call is now on the stack.
-                    codes.Insert( i + 4, codes[ i ].Clone()); // load 'component'
-                    codes.Insert( i + 5, codes[ i + 1 ].Clone()); // load 'component2'
+                    codes.Insert( i + 4, codes[ i + 1 ].Clone()); // load 'component2'
+                    codes.Insert( i + 5, codes[ i ].Clone()); // load 'component'
                     codes.Insert( i + 6, new CodeInstruction( OpCodes.Call,
                         typeof( HandSanitizer_Work_Patch ).GetMethod( nameof( OnWorkTick_Hook1 ))));
                     found1 = true;
