@@ -174,4 +174,43 @@ namespace PackagedBleachStone
             return false;
         }
     }
+
+    [HarmonyPatch(typeof(HotTubConfig))]
+    public class HotTubConfig_Patch
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(ConfigureBuildingTemplate))]
+        public static void ConfigureBuildingTemplate(GameObject go)
+        {
+            ManualDeliveryKG manualDeliveryKG = go.GetComponent<ManualDeliveryKG>();
+            manualDeliveryKG.RequestedItemTag = PackagedBleachStoneConfig.ID.ToTag();
+            manualDeliveryKG.capacity /= PackagedBleachStoneConfig.PackageSize;
+            manualDeliveryKG.refillMass /= PackagedBleachStoneConfig.PackageSize;
+            manualDeliveryKG.MinimumMass /= PackagedBleachStoneConfig.PackageSize;
+            HotTub hotTub = go.GetComponent<HotTub>();
+            hotTub.bleachStoneConsumption /= PackagedBleachStoneConfig.PackageSize;
+        }
+    }
+
+    [HarmonyPatch(typeof(HotTub.StatesInstance))]
+    public class HotTub_StatesInstance_Patch
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(HasBleachStone))]
+        public static bool HasBleachStone(ref bool __result, HotTub.StatesInstance __instance)
+        {
+            __result = __instance.master.waterStorage.GetMassAvailable(
+                PackagedBleachStoneConfig.ID.ToTag()) > 0;
+            return false;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(ConsumeBleachstone))]
+        public static bool ConsumeBleachstone(HotTub.StatesInstance __instance, float dt)
+        {
+            __instance.master.waterStorage.ConsumeIgnoringDisease(
+                PackagedBleachStoneConfig.ID.ToTag(), __instance.master.bleachStoneConsumption * dt);
+            return false;
+        }
+    }
 }
