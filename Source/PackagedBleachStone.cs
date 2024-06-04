@@ -20,7 +20,8 @@ namespace PackagedBleachStone
         {
             GameObject template = EntityTemplates.CreateLooseEntity(ID, STRINGS.PACKAGEDBLEACHSTONE.NAME,
                 STRINGS.PACKAGEDBLEACHSTONE.DESC, 1f, unitMass: true, Assets.GetAnim("llunak_packagedbleachstone_kanim"),
-                "object", Grid.SceneLayer.Front, EntityTemplates.CollisionShape.RECTANGLE, 0.8f, 0.4f, isPickupable: true);
+                "object", Grid.SceneLayer.Front, EntityTemplates.CollisionShape.RECTANGLE, 0.8f, 0.4f, isPickupable: true,
+                element : SimHashes.BleachStone);
             ComplexRecipe.RecipeElement[] array = new ComplexRecipe.RecipeElement[1]
             {
                 new ComplexRecipe.RecipeElement(SimHashes.BleachStone.CreateTag(), PackageSize)
