@@ -1,6 +1,7 @@
 using HarmonyLib;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection.Emit;
 
 namespace PackagedBleachStone
@@ -211,6 +212,37 @@ namespace PackagedBleachStone
             __instance.master.waterStorage.ConsumeIgnoringDisease(
                 PackagedBleachStoneConfig.ID.ToTag(), __instance.master.bleachStoneConsumption * dt);
             return false;
+        }
+    }
+
+    public class GeoTunerConfig_Patch
+    {
+        // The static variable is set up in the class constructor, which cannot be patched.
+        // Change it manually for mod setup.
+        public static void Patch()
+        {
+            // GeotunedGeyserSettings a struct, so it is copied by value. Create a new one and
+            // replace the old one everywhere.
+            GeoTunerConfig.Category[] keys1 = GeoTunerConfig.CategorySettings.Keys.ToArray();
+            foreach( var key in keys1 )
+            {
+                var setting = GeoTunerConfig.CategorySettings[ key ];
+                if( setting.material != SimHashes.BleachStone.CreateTag())
+                    continue;
+                setting.material = PackagedBleachStoneConfig.ID.ToTag();
+                setting.quantity /= PackagedBleachStoneConfig.PackageSize;
+                GeoTunerConfig.CategorySettings[ key ] = setting;
+            }
+            HashedString[] keys2 = GeoTunerConfig.geotunerGeyserSettings.Keys.ToArray();
+            foreach( var key in keys2 )
+            {
+                var setting = GeoTunerConfig.geotunerGeyserSettings[ key ];
+                if( setting.material != SimHashes.BleachStone.CreateTag())
+                    continue;
+                setting.material = PackagedBleachStoneConfig.ID.ToTag();
+                setting.quantity /= PackagedBleachStoneConfig.PackageSize;
+                GeoTunerConfig.geotunerGeyserSettings[ key ] = setting;
+            }
         }
     }
 }

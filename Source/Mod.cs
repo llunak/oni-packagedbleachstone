@@ -2,7 +2,7 @@ using HarmonyLib;
 using PeterHan.PLib.Core;
 using PeterHan.PLib.Options;
 
-namespace PackagedBleachSone
+namespace PackagedBleachStone
 {
     public class Mod : KMod.UserMod2
     {
@@ -10,6 +10,7 @@ namespace PackagedBleachSone
         {
             base.OnLoad( harmony );
             LocString.CreateLocStringKeys( typeof( STRINGS.PACKAGEDBLEACHSTONE ));
+            GeoTunerConfig_Patch.Patch();
         }
     }
 }
