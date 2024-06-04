@@ -7,7 +7,7 @@ namespace PackagedBleachStone
     {
         public const string ID = "llunak.PackagedBleachStone";
 
-        public const float PackageSize = 10; // 10kg in one item
+        public const float PackageSize = 5; // 5kg in one item
 
         public static ComplexRecipe recipe;
 
@@ -33,7 +33,7 @@ namespace PackagedBleachStone
             string text = "Apothecary";
             recipe = new ComplexRecipe(ComplexRecipeManager.MakeRecipeID(text, array, array2), array, array2)
             {
-                time = 20f,
+                time = 10f,
                 description = STRINGS.PACKAGEDBLEACHSTONE.RECIPEDESC,
                 nameDisplay = ComplexRecipe.RecipeNameDisplay.Result,
                 fabricators = new List<Tag> { text },
