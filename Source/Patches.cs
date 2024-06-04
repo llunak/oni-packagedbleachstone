@@ -245,4 +245,75 @@ namespace PackagedBleachStone
             }
         }
     }
+
+    [HarmonyPatch(typeof(SeaLettuceConfig))]
+    public class SeaLettuceConfig_Patch
+    {
+        [HarmonyTranspiler]
+        [HarmonyPatch(nameof(CreatePrefab))]
+        public static IEnumerable<CodeInstruction> CreatePrefab(IEnumerable<CodeInstruction> instructions)
+        {
+            var codes = new List<CodeInstruction>(instructions);
+            bool found = false;
+            for( int i = 0; i < codes.Count; ++i )
+            {
+                // Debug.Log("T:" + i + ":" + codes[i].opcode + "::" + (codes[i].operand != null ? codes[i].operand.ToString() : codes[i].operand));
+                // The function has code:
+                // EntityTemplates.ExtendPlantToFertilizable(gameObject, new PlantElementAbsorber.ConsumeInfo[1]
+                // {
+                //      new PlantElementAbsorber.ConsumeInfo
+                //      {
+                //              tag = SimHashes.BleachStone.CreateTag(),
+                //              massConsumptionRate = 0.00083333335f
+                //      }
+                // });
+                // Change to:
+                // EntityTemplates.ExtendPlantToFertilizable(gameObject, new PlantElementAbsorber.ConsumeInfo[1]
+                // {
+                //      new PlantElementAbsorber.ConsumeInfo
+                //      {
+                //              tag = CreatePrefab_Hook1( PackagedBleachStoneConfig.ID.ToTag()),
+                //              massConsumptionRate = CreatePrefab_Hook2( 0.00083333335f )
+                //      }
+                // });
+                if( codes[ i ].opcode == OpCodes.Stfld && codes[ i ].operand.ToString() == "Tag tag"
+                    && i + 6 < codes.Count
+                    && codes[ i + 1 ].opcode == OpCodes.Ldloca_S
+                    && codes[ i + 2 ].opcode == OpCodes.Ldc_R4
+                    && codes[ i + 3 ].opcode == OpCodes.Stfld
+                    && codes[ i + 3 ].operand.ToString() == "System.Single massConsumptionRate"
+                    && codes[ i + 4 ].IsLdloc()
+                    && codes[ i + 5 ].opcode == OpCodes.Stelem
+                    && codes[ i + 5 ].operand.ToString() == "PlantElementAbsorber+ConsumeInfo"
+                    && codes[ i + 6 ].opcode == OpCodes.Call
+                    && codes[ i + 6 ].operand.ToString()
+                        == "UnityEngine.GameObject ExtendPlantToFertilizable(UnityEngine.GameObject, ConsumeInfo[])" )
+                {
+                    // The tag value is on the stack before the first instruction, which stores it.
+                    codes.Insert( i, new CodeInstruction( OpCodes.Call,
+                        typeof( SeaLettuceConfig_Patch ).GetMethod( nameof( CreatePrefab_Hook1 ))));
+                    // The consumpation value is on the stack before the i+3 instruction that stores it.
+                    codes.Insert( i + 3 + 1, new CodeInstruction( OpCodes.Call,
+                        typeof( SeaLettuceConfig_Patch ).GetMethod( nameof( CreatePrefab_Hook2 ))));
+                    found = true;
+                    break;
+                }
+            }
+            if( !found )
+                Debug.LogWarning("PackagedBleachStone: Failed to patch SeaLettuceConfig.CreatePrefab()");
+            return codes;
+        }
+
+        public static Tag CreatePrefab_Hook1( Tag tag )
+        {
+            // TODO configurable
+            return PackagedBleachStoneConfig.ID.ToTag();
+        }
+
+        public static float CreatePrefab_Hook2( float massConsumptionRate )
+        {
+            // TODO configurable
+            return massConsumptionRate / PackagedBleachStoneConfig.PackageSize;
+        }
+    }
 }
