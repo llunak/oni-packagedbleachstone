@@ -47,36 +47,5 @@
     <Reference Include="UnityEngine.UI">
       <HintPath>..\lib\UnityEngine.UI.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>..\lib\Unity.TextMeshPro.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>..\lib\UnityEngine.TextRenderingModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UIModule">
-      <HintPath>..\lib\UnityEngine.UIModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>..\lib\UnityEngine.InputLegacyModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>..\lib\UnityEngine.ImageConversionModule.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\lib\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="FMODUnity">
-      <HintPath>..\lib\FMODUnity.dll</HintPath>
-    </Reference>
-    <Reference Include="PLib">
-      <HintPath>..\packages\PLib.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
   </ItemGroup>
-  <PropertyGroup Condition=" '$(OS)' != 'Windows_NT'">
-    <PostBuildEvent>mono "$(MSBuildProjectDirectory)/../packages/ILRepack.exe" /ndebug "/lib:$(MSBuildProjectDirectory)/../lib/" "/out:$(AssemblyName).dll" "$(AssemblyName).dll" "$(MSBuildProjectDirectory)/../packages/PLib.dll" /targetplatform:v4</PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT'">
-    <PostBuildEvent>"$(MSBuildProjectDirectory)\..\packages\ILRepack.exe" \ndebug "\lib:$(MSBuildProjectDirectory)\..\lib\" "\out:$(AssemblyName).dll" "$(AssemblyName).dll" "$(MSBuildProjectDirectory)\..\packages\PLib.dll" \targetplatform:v4</PostBuildEvent>
-  </PropertyGroup>
 </Project>

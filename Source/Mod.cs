@@ -1,6 +1,4 @@
 using HarmonyLib;
-using PeterHan.PLib.Core;
-using PeterHan.PLib.Options;
 
 namespace PackagedBleachStone
 {
