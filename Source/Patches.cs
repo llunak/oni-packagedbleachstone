@@ -2,10 +2,33 @@ using HarmonyLib;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 
 namespace PackagedBleachStone
 {
+    // Patch apothecary to make the ingredient storage sealed.
+    [HarmonyPatch(typeof(ApothecaryConfig))]
+    public class ApothecaryConfig_Patch
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(ConfigureBuildingTemplate))]
+        public static void ConfigureBuildingTemplate(GameObject go, Tag prefab_tag)
+        {
+            Apothecary fabricator = go.GetComponent< Apothecary >();
+            FieldInfo defaultStoredItemModifersField = AccessTools.Field( typeof( Storage ), "defaultStoredItemModifers" );
+            List< Storage.StoredItemModifier > storedItemModifiers;
+            storedItemModifiers = new List< Storage.StoredItemModifier >(
+                ( List< Storage.StoredItemModifier > ) defaultStoredItemModifersField.GetValue( fabricator.inStorage ));
+            storedItemModifiers.Add( Storage.StoredItemModifier.Seal );
+            fabricator.inStorage.SetDefaultStoredItemModifiers( storedItemModifiers );
+            storedItemModifiers = new List< Storage.StoredItemModifier >(
+                ( List< Storage.StoredItemModifier > ) defaultStoredItemModifersField.GetValue( fabricator.buildStorage ));
+            storedItemModifiers.Add( Storage.StoredItemModifier.Seal );
+            fabricator.buildStorage.SetDefaultStoredItemModifiers( storedItemModifiers );
+        }
+    }
+
     [HarmonyPatch(typeof(HandSanitizerConfig))]
     public class HandSanitizerConfig_Patch
     {
