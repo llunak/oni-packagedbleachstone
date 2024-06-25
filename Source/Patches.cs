@@ -268,4 +268,38 @@ namespace PackagedBleachStone
             }
         }
     }
+
+    [HarmonyPatch(typeof(GeoTuner))]
+    public class GeoTuner_Patch
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(WorkRequirementsMet))]
+        public static bool WorkRequirementsMet(ref bool __result, GeoTuner.Instance smi)
+        {
+            if( smi.manualDelivery.RequestedItemTag != PackagedBleachStoneConfig.ID.ToTag())
+                return true;
+            __result = false;
+            // With the packs capacityKg is actually units.
+            if(GeoTuner.IsInLabRoom(smi))
+                if( smi.storage.UnitsStored() == smi.storage.capacityKg )
+                    __result = true;
+            return false;
+        }
+
+        // Patching the class causes it to be initialized, i.e. its cctor is called.
+        // And that's where the liquidGeyserTuningSoundPath etc. fields are initialized,
+        // but doing that already here is apparently too soon and GlobalAssets is not ready yet,
+        // causing the field to be null. So patch the only function where they are used
+        // and make sure the values are valid.
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(TriggerSoundsForGeyserChange))]
+        public static void TriggerSoundsForGeyserChange()
+        {
+            if( GeoTuner.liquidGeyserTuningSoundPath != null )
+                return;
+            GeoTuner.liquidGeyserTuningSoundPath = GlobalAssets.GetSound("GeoTuner_Tuning_Geyser");
+            GeoTuner.gasGeyserTuningSoundPath = GlobalAssets.GetSound("GeoTuner_Tuning_Vent");
+            GeoTuner.metalGeyserTuningSoundPath = GlobalAssets.GetSound("GeoTuner_Tuning_Volcano");
+        }
+    }
 }
