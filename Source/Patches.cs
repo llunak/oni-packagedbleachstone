@@ -100,12 +100,12 @@ namespace PackagedBleachStone
                 // Change to:
                 // OnWorkTick_Hook2( <the call above>, component )
                 if( codes[ i ].IsLdloc()
-                    && i + 3 < codes.Count
+                    && i + 4 < codes.Count
                     && codes[ i + 1 ].opcode == OpCodes.Ldfld && codes[ i + 1 ].operand.ToString() == "SimHashes consumedElement"
-                    && codes[ i + 2 ].opcode == OpCodes.Callvirt
+                    && codes[ i + 2 ].opcode == OpCodes.Call
                     && codes[ i + 2 ].operand.ToString() == "Element FindElementByHash(SimHashes)"
                     && codes[ i + 3 ].opcode == OpCodes.Ldfld
-                    && codes[ i + 3 ].operand.ToString() == "tag" )
+                    && codes[ i + 3 ].operand.ToString() == "Tag tag" )
                 {
                     // The value of the expression is now on the stack.
                     codes.Insert( i + 4, codes[ i ].Clone()); // load 'component'
